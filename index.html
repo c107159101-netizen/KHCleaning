@@ -8,6 +8,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- SheetJS for Excel Export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- html2canvas for PNG Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- jsPDF for direct 1-page PDF Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -58,7 +62,7 @@
       }
       @page {
         size: A4 landscape;
-        margin: 0.4cm;
+        margin: 0.3cm;
       }
     }
   </style>
@@ -78,16 +82,22 @@
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <button onclick="openRosterModal()" class="flex items-center gap-1.5 px-3.5 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition shadow-sm">
-          <i data-lucide="users" class="w-4 h-4"></i> 檢視/編輯 4個小組名冊
+        <button onclick="openRosterModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition shadow-sm">
+          <i data-lucide="users" class="w-4 h-4"></i> 小組名冊
         </button>
-        <button onclick="triggerPrint()" class="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold transition shadow-sm">
-          <i data-lucide="printer" class="w-4 h-4"></i> 列印 / 轉 PDF
+        <button onclick="exportToPDF()" class="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 rounded-lg text-xs font-semibold transition shadow-sm">
+          <i data-lucide="file-text" class="w-4 h-4"></i> 下載 1頁式 PDF
         </button>
-        <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-semibold transition shadow-sm">
+        <button onclick="exportToPNG()" class="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-500 rounded-lg text-xs font-semibold transition shadow-sm">
+          <i data-lucide="image" class="w-4 h-4"></i> 下載 PNG 圖片
+        </button>
+        <button onclick="triggerPrint()" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold transition shadow-sm">
+          <i data-lucide="printer" class="w-4 h-4"></i> 列印視窗
+        </button>
+        <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-semibold transition shadow-sm">
           <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> 匯出 Excel
         </button>
-        <button onclick="saveData()" class="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-xs font-semibold transition shadow-sm">
+        <button onclick="saveData()" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded-lg text-xs font-semibold transition shadow-sm">
           <i data-lucide="save" class="w-4 h-4"></i> 儲存設定
         </button>
       </div>
@@ -152,7 +162,7 @@
         </div>
 
         <div class="flex items-end gap-2">
-          <button onclick="autoAssignActiveGroups()" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium transition shadow-sm" title="將當前選擇的兩個小組成員自動平均分配至各打掃區域">
+          <button onclick="autoAssignActiveGroups()" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium transition shadow-sm" title="可重複點擊以產生不同的洗牌版本">
             <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> 依輪值小組自動派班
           </button>
           <button onclick="resetDefault()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-medium transition">
@@ -177,7 +187,7 @@
           <span class="text-xs text-indigo-200 ml-2">(可動員總人數：<span id="active-publisher-count">19</span> 位傳道員)</span>
         </p>
       </div>
-      <p class="text-xs text-indigo-200">Tip: 點擊右上方「依輪值小組自動派班」可一鍵自動安排這兩組的人員至所有工作區域。</p>
+      <p class="text-xs text-indigo-200">Tip: 點擊「依輪值小組自動派班」可一直點擊以隨機產出不同版本的排班安排！</p>
     </div>
 
     <!-- Tool Color Legend Cards -->
@@ -238,8 +248,9 @@
     <div class="mt-4 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
       <div class="flex items-center gap-1.5">
         <i data-lucide="info" class="w-4 h-4 text-indigo-500"></i>
+        <span>提示：表格可隨時雙擊修改；上方提供「下載 1頁式 PDF」與「下載 PNG 圖片」按鈕，方便發至群組。</span>
       </div>
-      <p class="no-print font-medium text-slate-400">埔里會眾 王國聚會所管理模組 v3.1</p>
+      <p class="no-print font-medium text-slate-400">埔里會眾 王國聚會所管理模組 v3.3</p>
     </div>
 
   </main>
@@ -380,7 +391,7 @@
   <script>
     // Four Groups Personnel Master Lists
     const defaultGroupRosters = {
-      groupA: { name: "埔里 A小組", members: ["呂正金", "洪承緯", "王蘇韻", "王春秀", "吳欣烜", "林宜均", "洪蘊美", "廖敏潔", "潘彥伶", "呂天惠", "鄭淑惠"] },
+      groupA: { name: "埔里 A小組", members: ["呂正金", "洪承緯", "王蘇韻", "王春秀", "吳欣烜", "林宜均", "洪蘊美", "廖敏潔", "潘彥伶", "呂天惠", "鄭淑惠", "洪書念"] },
       groupB: { name: "埔里 B小組", members: ["幸秉憲", "吳和融", "幸敏環", "許郁娸", "祝暉晴", "蔡麗月", "吳閔媛", "廖家誼"] },
       groupC: { name: "埔里 C小組", members: ["林金文", "賴良昭", "陳素琴", "賴雪瑛", "林保暻", "黃琪芳", "汪辰璘", "黃潔恩", "吳佩怡", "陳玉花"] },
       groupD: { name: "埔里 D小組", members: ["呂喬瑋", "紅正雄", "譚奕雯", "劉美玲", "黃玲瑜", "湯千敏", "柯沛玨", "陳文玲", "劉奕呈", "辛慧晴"] }
@@ -549,8 +560,6 @@
     function handleMonthChange() {
       const month = parseInt(document.getElementById('month-input').value, 10);
       
-      // Automatic monthly rotation pairing algorithm (Optional auto-suggest)
-      // Month % 4 rotation: Month 1,5,9 -> A+B; Month 2,6,10 -> C+D; Month 3,7,11 -> A+C; Month 4,8,12 -> B+D
       let m1 = 'groupA', m2 = 'groupB';
       const rot = month % 4;
       if (rot === 2) { m1 = 'groupC'; m2 = 'groupD'; }
@@ -568,14 +577,6 @@
       const item = scheduleData.find(d => d.id === id);
       if (item) {
         item[field] = value.trim();
-        saveData(false);
-      }
-    }
-
-    function toggleCheck(id, weekIndex) {
-      const item = scheduleData.find(d => d.id === id);
-      if (item) {
-        item.checks[weekIndex] = !item.checks[weekIndex];
         saveData(false);
       }
     }
@@ -619,8 +620,7 @@
         content: document.getElementById('new-content').value.trim(),
         tools: document.getElementById('new-tools').value.trim(),
         assignees: document.getElementById('new-assignees').value.trim(),
-        freq: freq,
-        checks: [false, false, false, false, false]
+        freq: freq
       };
       scheduleData.push(newItem);
       renderTable();
@@ -682,10 +682,127 @@
       document.getElementById('print-date-display').innerText = `${year} 年 ${month} 月`;
     }
 
+    function createExportNode() {
+      const hallTitle = document.getElementById('print-hall-title').innerText;
+      const activeGroups = document.getElementById('print-active-groups-display').innerText;
+      const dateDisplay = document.getElementById('print-date-display').innerText;
+
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = '1200px';
+      container.style.backgroundColor = '#ffffff';
+      container.style.padding = '20px 24px';
+      container.style.fontFamily = "'Noto Sans TC', sans-serif";
+      container.style.color = '#0f172a';
+
+      // Clone table and remove action columns
+      const table = document.getElementById('cleaning-table').cloneNode(true);
+      table.querySelectorAll('.no-print').forEach(el => el.remove());
+
+      container.innerHTML = `
+        <div style="border-bottom: 2px solid #1e1b4b; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end;">
+          <div>
+            <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0;">${hallTitle}</h1>
+            <p style="font-size: 11px; color: #475569; margin: 4px 0 0 0;">指引：請當值小組成員於每次聚會前後完成指派工作，完成後請在當週框內打勾。請小組監督與清潔協調人定期確認。</p>
+          </div>
+          <div style="text-align: right; font-size: 12px; white-space: nowrap;">
+            <p style="font-weight: 700; color: #1e1b4b; margin: 0 0 2px 0;">當月輪值小組：<span style="color: #d97706;">${activeGroups}</span></p>
+            <p style="margin: 0; color: #334155;">排班月份：<strong>${dateDisplay}</strong></p>
+          </div>
+        </div>
+        <div style="width: 100%;">
+          ${table.outerHTML}
+        </div>
+        <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 10px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 6px;">
+          <span>抹布顏色規範：黃布(消毒高頻接觸面) / 紅布(廁所潔具) / 綠布(室內一般表面) / 白布(玻璃門窗)</span>
+          <span>埔里會眾 王國聚會所清潔管理系統</span>
+        </div>
+      `;
+
+      return container;
+    }
+
+    async function exportToPNG() {
+      showToast('正在產生高畫質 PNG 圖片...');
+      const node = createExportNode();
+      document.body.appendChild(node);
+
+      try {
+        const canvas = await html2canvas(node, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+
+        const link = document.createElement('a');
+        const hall = document.getElementById('hall-input').value;
+        const year = document.getElementById('year-input').value;
+        const month = document.getElementById('month-input').value;
+
+        link.download = `${hall}_清潔工作安排表_${year}年${month}月.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('PNG 圖片下載完成！');
+      } catch (err) {
+        console.error(err);
+        showToast('圖片產生失敗，請再試一次');
+      } finally {
+        document.body.removeChild(node);
+      }
+    }
+
+    async function exportToPDF() {
+      showToast('正在產生 1 頁式 PDF...');
+      const node = createExportNode();
+      document.body.appendChild(node);
+
+      try {
+        const canvas = await html2canvas(node, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('landscape', 'pt', 'a4'); // A4 landscape: 841.89 x 595.28 pt
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+
+        const ratio = Math.min((pdfWidth - 24) / imgWidth, (pdfHeight - 24) / imgHeight);
+        const renderWidth = imgWidth * ratio;
+        const renderHeight = imgHeight * ratio;
+
+        const x = (pdfWidth - renderWidth) / 2;
+        const y = (pdfHeight - renderHeight) / 2;
+
+        pdf.addImage(imgData, 'PNG', x, y, renderWidth, renderHeight);
+
+        const hall = document.getElementById('hall-input').value;
+        const year = document.getElementById('year-input').value;
+        const month = document.getElementById('month-input').value;
+
+        pdf.save(`${hall}_清潔工作安排表_${year}年${month}月.pdf`);
+        showToast('一頁式 PDF 下載完成！');
+      } catch (err) {
+        console.error(err);
+        showToast('PDF 產生失敗，請改用列印對話框');
+      } finally {
+        document.body.removeChild(node);
+      }
+    }
+
     function triggerPrint() {
       try {
         window.focus();
-        // 如果在內嵌 iFrame 中，開啟獨立列印視窗以突破瀏覽器限制
         if (window.self !== window.top) {
           openPrintWindow();
           return;
@@ -701,7 +818,6 @@
       const activeGroups = document.getElementById('print-active-groups-display').innerText;
       const dateDisplay = document.getElementById('print-date-display').innerText;
 
-      // 複製表格並移除操作欄
       const table = document.getElementById('cleaning-table').cloneNode(true);
       table.querySelectorAll('.no-print').forEach(el => el.remove());
 
@@ -737,7 +853,7 @@
             <div class="flex justify-between items-end">
               <div>
                 <h1 class="text-lg font-bold text-slate-900">${hallTitle}</h1>
-                <p class="text-[9px] text-slate-600 mt-0.5">指引：請當值小組成員於每次聚會前後完成指派工作</p>
+                <p class="text-[9px] text-slate-600 mt-0.5">指引：請當值小組成員於每次聚會前後完成指派工作，完成後請在當週框內打勾。請小組監督與清潔協調人定期確認。</p>
               </div>
               <div class="text-right text-[10px] text-slate-700 whitespace-nowrap">
                 <p class="font-bold text-indigo-900"><span class="font-semibold">當月輪值小組：</span>${activeGroups}</p>
