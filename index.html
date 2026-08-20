@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>埔里會眾王國聚會所清潔工作表</title>
+  <title>埔里會眾 王國聚會所清潔工作表</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- SheetJS for Excel Export -->
@@ -112,7 +112,7 @@
       <div class="flex justify-between items-end">
         <div>
           <h1 class="text-2xl font-bold text-slate-900" id="print-hall-title">埔里會眾 王國聚會所清潔工作安排與檢核表</h1>
-          <p class="text-xs text-slate-600 mt-1">指引：請當值小組成員於每次聚會前後完成指派工作，完成後請在當週框內打勾。請小組監督與清潔協調人定期確認。</p>
+          <p class="text-xs text-slate-600 mt-1">指引：請當值小組成員於每次聚會前後完成指派工作。請小組監督與清潔協調人定期確認。</p>
         </div>
         <div class="text-right text-xs text-slate-700">
           <p class="text-sm font-bold text-indigo-900 mb-0.5"><span class="font-semibold">當月輪值小組：</span><span id="print-active-groups-display">埔里 A小組 + 埔里 B小組</span></p>
@@ -162,8 +162,8 @@
         </div>
 
         <div class="flex items-end gap-2">
-          <button onclick="autoAssignActiveGroups()" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium transition shadow-sm" title="可重複點擊以產生不同的洗牌版本">
-            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> 依輪值小組自動派班
+          <button onclick="autoAssignActiveGroups()" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium transition shadow-sm" title="點擊無限制產生全員無重複的隨機派班">
+            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> 依輪值小組自動派班 (無重複)
           </button>
           <button onclick="resetDefault()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-medium transition">
             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 重設預設排班
@@ -187,7 +187,7 @@
           <span class="text-xs text-indigo-200 ml-2">(可動員總人數：<span id="active-publisher-count">19</span> 位傳道員)</span>
         </p>
       </div>
-      <p class="text-xs text-indigo-200">Tip: 點擊「依輪值小組自動派班」可一直點擊以隨機產出不同版本的排班安排！</p>
+      <p class="text-xs text-indigo-200">✨ 派班邏輯已優化：每次點擊會自動將所有人隨機打散，確保每個人只安排 1 個區域！</p>
     </div>
 
     <!-- Tool Color Legend Cards -->
@@ -228,12 +228,11 @@
         <table class="w-full text-left border-collapse" id="cleaning-table">
           <thead>
             <tr class="bg-indigo-950 text-white text-xs uppercase tracking-wider">
-              <th class="py-3 px-3 border border-indigo-800 text-center w-28">分類 / 類別</th>
-              <th class="py-3 px-3 border border-indigo-800 w-44">清潔區域細項</th>
-              <th class="py-3 px-3 border border-indigo-800 min-w-[200px]">工作內容與標準指引</th>
-              <th class="py-3 px-3 border border-indigo-800 w-52">清潔工具規範 (顏色管理)</th>
-              <th class="py-3 px-3 border border-indigo-800 w-40 text-center">負責人員</th>
-              <th class="py-3 px-2 border border-indigo-800 text-center w-20">頻率</th>
+              <th class="py-3 px-3 border border-indigo-800 w-52">清潔區域細項</th>
+              <th class="py-3 px-3 border border-indigo-800 min-w-[220px]">工作內容與標準指引</th>
+              <th class="py-3 px-3 border border-indigo-800 w-56">清潔工具規範 (顏色管理)</th>
+              <th class="py-3 px-3 border border-indigo-800 w-44 text-center">負責人員</th>
+              <th class="py-3 px-2 border border-indigo-800 text-center w-24">頻率</th>
               <th class="py-3 px-2 border border-indigo-800 text-center w-12 no-print">操作</th>
             </tr>
           </thead>
@@ -250,7 +249,7 @@
         <i data-lucide="info" class="w-4 h-4 text-indigo-500"></i>
         <span>提示：表格可隨時雙擊修改；上方提供「下載 1頁式 PDF」與「下載 PNG 圖片」按鈕，方便發至群組。</span>
       </div>
-      <p class="no-print font-medium text-slate-400">埔里會眾 王國聚會所管理模組 v3.3</p>
+      <p class="no-print font-medium text-slate-400">埔里會眾 王國聚會所管理模組 v3.5</p>
     </div>
 
   </main>
@@ -336,21 +335,15 @@
         </button>
       </div>
       <form id="addScheduleForm" onsubmit="handleAddSchedule(event)" class="space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">分類 / 類別</label>
-            <input type="text" id="new-category" placeholder="例如：講台與設備" required class="w-full px-3 py-1.5 border rounded-lg text-xs">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">頻率</label>
-            <select id="new-freq" class="w-full px-3 py-1.5 border rounded-lg text-xs bg-slate-50">
-              <option value="每次聚會">每次聚會</option>
-              <option value="每週三">每週三</option>
-              <option value="每週六">每週六</option>
-              <option value="每月">每月</option>
-              <option value="按需要">按需要</option>
-            </select>
-          </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">頻率</label>
+          <select id="new-freq" class="w-full px-3 py-1.5 border rounded-lg text-xs bg-slate-50">
+            <option value="每次聚會">每次聚會</option>
+            <option value="每週三">每週三</option>
+            <option value="每週六">每週六</option>
+            <option value="每月">每月</option>
+            <option value="按需要">按需要</option>
+          </select>
         </div>
 
         <div>
@@ -391,7 +384,7 @@
   <script>
     // Four Groups Personnel Master Lists
     const defaultGroupRosters = {
-      groupA: { name: "埔里 A小組", members: ["呂正金", "洪承緯", "王蘇韻", "王春秀", "吳欣烜", "林宜均", "洪蘊美", "廖敏潔", "潘彥伶", "呂天惠", "鄭淑惠", "洪書念"] },
+      groupA: { name: "埔里 A小組", members: ["呂正金", "洪承緯", "王蘇韻", "王春秀", "吳欣烜", "林宜均", "洪蘊美", "廖敏潔", "潘彥伶", "呂天惠", "鄭淑惠"] },
       groupB: { name: "埔里 B小組", members: ["幸秉憲", "吳和融", "幸敏環", "許郁娸", "祝暉晴", "蔡麗月", "吳閔媛", "廖家誼"] },
       groupC: { name: "埔里 C小組", members: ["林金文", "賴良昭", "陳素琴", "賴雪瑛", "林保暻", "黃琪芳", "汪辰璘", "黃潔恩", "吳佩怡", "陳玉花"] },
       groupD: { name: "埔里 D小組", members: ["呂喬瑋", "紅正雄", "譚奕雯", "劉美玲", "黃玲瑜", "湯千敏", "柯沛玨", "陳文玲", "劉奕呈", "辛慧晴"] }
@@ -441,7 +434,7 @@
           const dividerTr = document.createElement('tr');
           dividerTr.className = 'bg-slate-200/90 text-indigo-950 font-bold';
           dividerTr.innerHTML = `
-            <td colspan="7" class="py-2.5 px-4 text-left border border-slate-300">
+            <td colspan="6" class="py-2.5 px-4 text-left border border-slate-300">
               <div class="flex items-center gap-2">
                 <i data-lucide="sparkles" class="w-4 h-4 text-indigo-700"></i>
                 <span>【每月 / 定期大掃除加強項目】</span>
@@ -462,8 +455,7 @@
         if (item.tools.includes('白')) toolTagColor = 'bg-sky-50 text-sky-900 border-sky-300';
 
         tr.innerHTML = `
-          <td class="py-3 px-3 border border-slate-200 font-semibold text-indigo-950 text-center cursor-pointer" contenteditable="true" onblur="updateField(${item.id}, 'category', this.innerText)">${item.category}</td>
-          <td class="py-3 px-3 border border-slate-200 text-slate-800 cursor-pointer" contenteditable="true" onblur="updateField(${item.id}, 'area', this.innerText)">${item.area}</td>
+          <td class="py-3 px-3 border border-slate-200 font-semibold text-slate-800 cursor-pointer" contenteditable="true" onblur="updateField(${item.id}, 'area', this.innerText)">${item.area}</td>
           <td class="py-3 px-3 border border-slate-200 text-slate-600 text-xs leading-relaxed cursor-pointer" contenteditable="true" onblur="updateField(${item.id}, 'content', this.innerText)">${item.content}</td>
           <td class="py-3 px-3 border border-slate-200 text-xs">
             <span class="inline-block px-2 py-1 rounded-md ${toolTagColor} font-medium border leading-snug cursor-pointer" contenteditable="true" onblur="updateField(${item.id}, 'tools', this.innerText)">
@@ -512,9 +504,16 @@
       const g1 = groupRosters[activeGroup1Key];
       const g2 = groupRosters[activeGroup2Key];
 
-      // Combine members from active groups
-      let pool = [...g1.members, ...g2.members];
-      if (pool.length === 0) return;
+      if (!g1 || !g2) return;
+
+      // Combine members from active groups and strictly deduplicate
+      let rawPool = [...(g1.members || []), ...(g2.members || [])];
+      let pool = Array.from(new Set(rawPool)).map(m => m.trim()).filter(m => m.length > 0);
+
+      if (pool.length === 0) {
+        showToast('當值小組尚無可排班人員！');
+        return;
+      }
 
       // Randomize array order to generate unique versions on every click
       for (let i = pool.length - 1; i > 0; i--) {
@@ -522,39 +521,56 @@
         [pool[i], pool[j]] = [pool[j], pool[i]];
       }
 
-      let poolIdx = 0;
-      const getNext = (count = 1) => {
-        const picked = [];
-        for (let i = 0; i < count; i++) {
-          picked.push(pool[poolIdx % pool.length]);
-          poolIdx++;
+      // Maintain an unassigned pool so NO ONE IS REPEATED across tasks
+      let unassignedPool = [...pool];
+      let usageCount = {};
+      pool.forEach(m => usageCount[m] = 0);
+
+      const getDistinctMembers = (count = 1) => {
+        const selected = [];
+        for (let c = 0; c < count; c++) {
+          if (unassignedPool.length > 0) {
+            // Pick a brand new unique person who hasn't been assigned to any task
+            const picked = unassignedPool.shift();
+            selected.push(picked);
+            usageCount[picked] = (usageCount[picked] || 0) + 1;
+          } else {
+            // Backup fallback: if total slots needed exceed group size, pick person NOT in current row, with lowest usage
+            const candidates = pool.filter(m => !selected.includes(m));
+            if (candidates.length === 0) break;
+            candidates.sort((a, b) => (usageCount[a] || 0) - (usageCount[b] || 0));
+            const picked = candidates[0];
+            selected.push(picked);
+            usageCount[picked] = (usageCount[picked] || 0) + 1;
+          }
         }
-        return picked.join('、');
+        return selected.join('、');
       };
 
-      // Assign publishers across active standard regular tasks
+      // Assign publishers across active standard regular tasks strictly without duplicates
       scheduleData.forEach(item => {
         if (item.type === 'regular') {
-          if (item.category.includes('講台')) item.assignees = getNext(2);
-          else if (item.category.includes('大廳地板')) item.assignees = getNext(3);
-          else if (item.category.includes('大廳與公用櫃')) item.assignees = getNext(2);
-          else if (item.category.includes('置物區')) item.assignees = getNext(1);
-          else if (item.category.includes('電梯與門面')) item.assignees = getNext(2);
-          else if (item.category.includes('電梯內部')) item.assignees = getNext(1);
-          else if (item.category.includes('高樓層')) item.assignees = getNext(2);
-          else if (item.category.includes('一樓進出')) item.assignees = getNext(1);
-          else if (item.category.includes('無小便斗')) item.assignees = getNext(1);
-          else if (item.category.includes('有小便斗')) item.assignees = getNext(1);
-          else if (item.category.includes('座椅維護')) item.assignees = getNext(2);
-          else if (item.category.includes('垃圾清運(三)')) item.assignees = `${g1.name} 全體成員`;
-          else if (item.category.includes('垃圾清運(六)')) item.assignees = `${g2.name} 全體成員`;
+          const areaName = item.area || item.category || '';
+          if (areaName.includes('講台')) item.assignees = getDistinctMembers(2);
+          else if (areaName.includes('大廳地板')) item.assignees = getDistinctMembers(3);
+          else if (areaName.includes('大廳') || areaName.includes('書櫃')) item.assignees = getDistinctMembers(2);
+          else if (areaName.includes('置物')) item.assignees = getDistinctMembers(1);
+          else if (areaName.includes('外牆') || areaName.includes('大門')) item.assignees = getDistinctMembers(2);
+          else if (areaName.includes('電梯內')) item.assignees = getDistinctMembers(1);
+          else if (areaName.includes('走廊') || areaName.includes('地毯')) item.assignees = getDistinctMembers(2);
+          else if (areaName.includes('一樓')) item.assignees = getDistinctMembers(1);
+          else if (areaName.includes('無小便斗')) item.assignees = getDistinctMembers(1);
+          else if (areaName.includes('有小便斗')) item.assignees = getDistinctMembers(1);
+          else if (areaName.includes('椅')) item.assignees = getDistinctMembers(2);
+          else if (areaName.includes('垃圾清運（三）') || areaName.includes('三')) item.assignees = `${g1.name} 全體成員`;
+          else if (areaName.includes('垃圾清運（六）') || areaName.includes('六')) item.assignees = `${g2.name} 全體成員`;
         }
       });
 
       versionCounter++;
       renderTable();
       saveData(false);
-      showToast(`已成功隨機產生派班【第 ${versionCounter} 版本】！`);
+      showToast(`已成功隨機產生派班【第 ${versionCounter} 版本】 (全員無重複)！`);
     }
 
     function handleMonthChange() {
@@ -615,7 +631,6 @@
       const newItem = {
         id: Date.now(),
         type: (freq === '每月' || freq === '按需要') ? 'deep' : 'regular',
-        category: document.getElementById('new-category').value.trim(),
         area: document.getElementById('new-area').value.trim(),
         content: document.getElementById('new-content').value.trim(),
         tools: document.getElementById('new-tools').value.trim(),
@@ -905,12 +920,11 @@
       const excelRows = [
         [`${hall} 清潔工作安排與檢核表`],
         [`排班月份: ${year} 年 ${month} 月`, `當值輪值小組: ${g1.name} + ${g2.name}`],
-        ["分類/類別", "清潔區域細項", "工作內容與標準指引", "清潔工具規範 (顏色管理)", "負責人員", "頻率"]
+        ["清潔區域細項", "工作內容與標準指引", "清潔工具規範 (顏色管理)", "負責人員", "頻率"]
       ];
 
       scheduleData.forEach(item => {
         excelRows.push([
-          item.category,
           item.area,
           item.content,
           item.tools,
