@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>埔里會眾 王國聚會所清潔工作表</title>
+  <title>埔里會眾 王國聚會所清潔工作安排與檢核管理系統</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- SheetJS for Excel Export -->
@@ -78,12 +78,15 @@
         </div>
         <div>
           <h1 class="text-xl font-bold tracking-tight">埔里會眾 王國聚會所清潔排班與檢核系統</h1>
-          <p class="text-xs text-indigo-300">結合 4 個傳道小組（雙小組輪值模式）與抹布顏色標準指引</p>
+          <p class="text-xs text-indigo-300">結合 4 個傳道小組（雙小組輪值模式）與歷史紀錄備份功能</p>
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <button onclick="openRosterModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition shadow-sm">
           <i data-lucide="users" class="w-4 h-4"></i> 小組名冊
+        </button>
+        <button onclick="openHistoryModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-purple-700 hover:bg-purple-600 rounded-lg text-xs font-semibold transition shadow-sm">
+          <i data-lucide="history" class="w-4 h-4"></i> 歷史紀錄
         </button>
         <button onclick="exportToPDF()" class="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 rounded-lg text-xs font-semibold transition shadow-sm">
           <i data-lucide="file-text" class="w-4 h-4"></i> 下載 1頁式 PDF
@@ -112,7 +115,7 @@
       <div class="flex justify-between items-end">
         <div>
           <h1 class="text-2xl font-bold text-slate-900" id="print-hall-title">埔里會眾 王國聚會所清潔工作安排與檢核表</h1>
-          <p class="text-xs text-slate-600 mt-1">指引：請當值小組成員於每次聚會前後完成指派工作。請小組監督與清潔協調人定期確認。</p>
+          <p class="text-xs text-slate-600 mt-1">指引：請當值小組成員於每次聚會前後完成指派工作，完成後請在當週框內打勾。請小組監督與清潔協調人定期確認。</p>
         </div>
         <div class="text-right text-xs text-slate-700">
           <p class="text-sm font-bold text-indigo-900 mb-0.5"><span class="font-semibold">當月輪值小組：</span><span id="print-active-groups-display">埔里 A小組 + 埔里 B小組</span></p>
@@ -187,7 +190,7 @@
           <span class="text-xs text-indigo-200 ml-2">(可動員總人數：<span id="active-publisher-count">19</span> 位傳道員)</span>
         </p>
       </div>
-      <p class="text-xs text-indigo-200">✨ 派班邏輯已優化：每次點擊會自動將所有人隨機打散，確保每個人只安排 1 個區域！</p>
+      <p class="text-xs text-indigo-200">✨ 點擊右上角「歷史紀錄」可存取過往月份的清潔排班存檔！</p>
     </div>
 
     <!-- Tool Color Legend Cards -->
@@ -247,12 +250,44 @@
     <div class="mt-4 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
       <div class="flex items-center gap-1.5">
         <i data-lucide="info" class="w-4 h-4 text-indigo-500"></i>
-        <span>提示：表格可隨時雙擊修改；上方提供「下載 1頁式 PDF」與「下載 PNG 圖片」按鈕，方便發至群組。</span>
+        <span>提示：表格可隨時雙擊修改；點擊「歷史紀錄」隨時儲存或存取過往排班存檔。</span>
       </div>
-      <p class="no-print font-medium text-slate-400">埔里會眾 王國聚會所管理模組 v3.5</p>
+      <p class="no-print font-medium text-slate-400">埔里會眾 王國聚會所管理模組 v3.6</p>
     </div>
 
   </main>
+
+  <!-- Modal Dialog for History Records -->
+  <div id="historyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 no-print">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4 pb-2 border-b">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="history" class="w-5 h-5 text-purple-600"></i>
+          清潔排班歷史紀錄與快照備份
+        </h3>
+        <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 bg-purple-50 p-3 rounded-xl border border-purple-100">
+        <p class="text-xs text-purple-900">
+          您可以隨時將當前的排班結果儲存為歷史快照，方便日後查閱、還原或匯出過往月份的清潔安排。
+        </p>
+        <button onclick="saveCurrentToHistory()" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-semibold shrink-0 transition shadow-sm flex items-center gap-1.5">
+          <i data-lucide="save" class="w-3.5 h-3.5"></i> 建立當前快照
+        </button>
+      </div>
+
+      <div class="space-y-3 min-h-[150px]" id="history-list-container">
+        <!-- Dynamic History Items -->
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4 border-t mt-6">
+        <button type="button" onclick="closeHistoryModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium">關閉</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Dialog for Group Rosters -->
   <div id="rosterModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 no-print">
@@ -384,7 +419,7 @@
   <script>
     // Four Groups Personnel Master Lists
     const defaultGroupRosters = {
-      groupA: { name: "埔里 A小組", members: ["呂正金", "洪承緯", "王蘇韻", "王春秀", "吳欣烜", "林宜均", "洪蘊美", "廖敏潔", "潘彥伶", "呂天惠", "鄭淑惠"] },
+      groupA: { name: "埔里 A小組", members: ["呂正金", "洪承緯", "王蘇韻", "王春秀", "吳欣烜", "林宜均", "洪蘊美", "廖敏潔", "潘彥伶", "呂天惠", "鄭淑惠", "洪書念"] },
       groupB: { name: "埔里 B小組", members: ["幸秉憲", "吳和融", "幸敏環", "許郁娸", "祝暉晴", "蔡麗月", "吳閔媛", "廖家誼"] },
       groupC: { name: "埔里 C小組", members: ["林金文", "賴良昭", "陳素琴", "賴雪瑛", "林保暻", "黃琪芳", "汪辰璘", "黃潔恩", "吳佩怡", "陳玉花"] },
       groupD: { name: "埔里 D小組", members: ["呂喬瑋", "紅正雄", "譚奕雯", "劉美玲", "黃玲瑜", "湯千敏", "柯沛玨", "陳文玲", "劉奕呈", "辛慧晴"] }
@@ -395,6 +430,9 @@
     // Active groups selection (Default: Group A + Group B)
     let activeGroup1Key = localStorage.getItem('puli_active_group_1') || 'groupA';
     let activeGroup2Key = localStorage.getItem('puli_active_group_2') || 'groupB';
+
+    // History Records Array
+    let historyRecords = JSON.parse(localStorage.getItem('puli_cleaning_schedule_history')) || [];
 
     // Standard Cleaning Tasks Template
     const defaultData = [
@@ -530,12 +568,10 @@
         const selected = [];
         for (let c = 0; c < count; c++) {
           if (unassignedPool.length > 0) {
-            // Pick a brand new unique person who hasn't been assigned to any task
             const picked = unassignedPool.shift();
             selected.push(picked);
             usageCount[picked] = (usageCount[picked] || 0) + 1;
           } else {
-            // Backup fallback: if total slots needed exceed group size, pick person NOT in current row, with lowest usage
             const candidates = pool.filter(m => !selected.includes(m));
             if (candidates.length === 0) break;
             candidates.sort((a, b) => (usageCount[a] || 0) - (usageCount[b] || 0));
@@ -687,6 +723,144 @@
       closeRosterModal();
       updateActiveBanner();
       showToast('4 個小組成員名冊已成功更新！');
+    }
+
+    // Modal Control for History
+    function openHistoryModal() {
+      renderHistoryList();
+      document.getElementById('historyModal').classList.remove('hidden');
+      document.getElementById('historyModal').classList.add('flex');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').classList.add('hidden');
+      document.getElementById('historyModal').classList.remove('flex');
+    }
+
+    function renderHistoryList() {
+      const container = document.getElementById('history-list-container');
+      container.innerHTML = '';
+
+      if (historyRecords.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+            <i data-lucide="clock" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+            <p class="text-xs">目前尚無排班歷史快照紀錄。</p>
+            <p class="text-[11px] text-slate-400 mt-1">您可以隨時點擊上方「建立當前快照」按鈕將現有表格排班進行存檔。</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      historyRecords.forEach(record => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-3.5 bg-white border border-slate-200 rounded-xl hover:border-purple-300 transition shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3';
+        
+        itemDiv.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="px-2.5 py-1.5 bg-purple-100 text-purple-900 font-bold rounded-lg text-xs text-center border border-purple-200 shrink-0">
+              ${record.year}年<br>${record.month}月
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <span>${record.hall || "王國聚會所"}</span>
+                <span class="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded font-semibold">${record.activeGroupNames || "輪值小組"}</span>
+              </p>
+              <p class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
+                <span>備份時間：${record.savedAt}</span>
+                <span>•</span>
+                <span>包含 ${record.scheduleData ? record.scheduleData.length : 0} 個項目</span>
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+            <button onclick="loadHistoryRecord(${record.id})" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold transition border border-indigo-200 flex items-center gap-1">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> 載入此版
+            </button>
+            <button onclick="deleteHistoryRecord(${record.id})" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="刪除快照">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(itemDiv);
+      });
+
+      lucide.createIcons();
+    }
+
+    function saveCurrentToHistory(showAlert = true) {
+      const year = document.getElementById('year-input').value;
+      const month = document.getElementById('month-input').value;
+      const hall = document.getElementById('hall-input').value;
+      const g1 = groupRosters[activeGroup1Key] || groupRosters['groupA'];
+      const g2 = groupRosters[activeGroup2Key] || groupRosters['groupB'];
+
+      const record = {
+        id: Date.now(),
+        year,
+        month,
+        hall,
+        activeGroup1Key,
+        activeGroup2Key,
+        activeGroupNames: `${g1.name} + ${g2.name}`,
+        scheduleData: JSON.parse(JSON.stringify(scheduleData)),
+        savedAt: new Date().toLocaleString('zh-TW', { hour12: false })
+      };
+
+      // Check if snapshot for same year/month already exists, replace or unshift
+      const existingIdx = historyRecords.findIndex(r => r.year === year && r.month === month);
+      if (existingIdx !== -1) {
+        historyRecords[existingIdx] = record;
+      } else {
+        historyRecords.unshift(record);
+      }
+
+      localStorage.setItem('puli_cleaning_schedule_history', JSON.stringify(historyRecords));
+      renderHistoryList();
+
+      if (showAlert) {
+        showToast(`已成功建立 ${year}年${month}月 排班快照備份！`);
+      }
+    }
+
+    function loadHistoryRecord(recordId) {
+      const record = historyRecords.find(r => r.id === recordId);
+      if (!record) return;
+
+      if (confirm(`確定要將畫面載入為 ${record.year}年${record.month}月 (${record.activeGroupNames}) 的排班存檔嗎？`)) {
+        document.getElementById('year-input').value = record.year;
+        document.getElementById('month-input').value = record.month;
+        document.getElementById('hall-input').value = record.hall || "埔里會眾 王國聚會所";
+
+        if (record.activeGroup1Key) {
+          activeGroup1Key = record.activeGroup1Key;
+          document.getElementById('group-select-1').value = activeGroup1Key;
+        }
+        if (record.activeGroup2Key) {
+          activeGroup2Key = record.activeGroup2Key;
+          document.getElementById('group-select-2').value = activeGroup2Key;
+        }
+
+        scheduleData = JSON.parse(JSON.stringify(record.scheduleData));
+
+        updateHeader();
+        updateActiveBanner();
+        renderTable();
+        saveData(false);
+        closeHistoryModal();
+        showToast(`已成功載入 ${record.year}年${record.month}月 的排班歷史紀錄！`);
+      }
+    }
+
+    function deleteHistoryRecord(recordId) {
+      if (confirm('確定要刪除這筆歷史排班快照嗎？')) {
+        historyRecords = historyRecords.filter(r => r.id !== recordId);
+        localStorage.setItem('puli_cleaning_schedule_history', JSON.stringify(historyRecords));
+        renderHistoryList();
+        showToast('已刪除該筆歷史紀錄！');
+      }
     }
 
     function updateHeader() {
@@ -896,8 +1070,12 @@
     function saveData(showNotification = true) {
       localStorage.setItem('puli_cleaning_schedule_data', JSON.stringify(scheduleData));
       localStorage.setItem('puli_group_rosters', JSON.stringify(groupRosters));
+      
+      // Auto update current month's history snapshot as well
+      saveCurrentToHistory(false);
+
       if (showNotification) {
-        showToast('設定與排班資料已儲存至瀏覽器！');
+        showToast('設定與排班資料已儲存（歷史快照已同步備份）！');
       }
     }
 
